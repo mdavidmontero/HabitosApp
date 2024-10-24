@@ -21,7 +21,7 @@ function DrawerNavigation() {
           backgroundColor: "#3463FA",
           borderRadius: 10,
         },
-        headerTitle: "",
+        headerTitle: "Habitips",
 
         headerTintColor: "#FFF",
         headerRight: () => (

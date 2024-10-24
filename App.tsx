@@ -3,7 +3,6 @@ import { ApplicationProvider, IconRegistry } from "@ui-kitten/components";
 import * as eva from "@eva-design/eva";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
 import { NavigationContainer } from "@react-navigation/native";
-import DrawerNavigation from "./src/presentation/router/DrawerNavigation";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { AuthProvider } from "./src/presentation/provider/AuthProvider";
 import ToastManager from "toastify-react-native";

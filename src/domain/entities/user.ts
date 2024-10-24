@@ -5,6 +5,7 @@ export interface User {
   telefono: string;
   email: string;
   password: string;
+  idusuario: string;
 }
 
 export interface UserRegisro {
