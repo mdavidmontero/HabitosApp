@@ -1,42 +1,90 @@
-import { AuthApiError } from "@supabase/supabase-js";
-import { supabase } from "../config/supabase/supabase";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  UserCredential,
+  onAuthStateChanged,
+  User,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { RolUsuario, UserRegisro } from "../domain/entities/user.entities";
+import { crearUsuario } from "./user.actions";
 
-export const obtenerUsuarioPorId = async (idusuario: string) => {
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("idusuario", idusuario);
-  if (error) {
+const auth = getAuth();
+
+export const registerUser = async (
+  nombres: string,
+  apellidos: string,
+  telefono: string,
+  correo: string,
+  password: string,
+  roles: RolUsuario
+): Promise<string | null> => {
+  try {
+    const userCredential: UserCredential = await createUserWithEmailAndPassword(
+      auth,
+      correo,
+      password
+    );
+    const usuario: UserRegisro = {
+      id: userCredential.user.uid,
+      nombres,
+      apellidos,
+      telefono,
+      correo,
+      roles,
+    };
+    await crearUsuario(usuario);
+    return userCredential.user.uid;
+  } catch (error: any) {
+    console.log(error);
+    if (error.code === "auth/email-already-in-use") {
+      throw new Error("El correo electrónico ya está en uso.");
+    }
+    if (error.code === "auth/weak-password") {
+      throw new Error("La contraseña debe tener al menos 6 caracteres.");
+    }
     throw error;
   }
-  return data;
 };
 
-export const LoginUser = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
-  });
-  if (error instanceof AuthApiError) {
-    if (error.code === "invalid_credentials") {
-      throw new Error("Credenciales Invalidas");
+export const login = async (
+  email: string,
+  password: string
+): Promise<string | null> => {
+  try {
+    const userCredential: UserCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    return userCredential.user.uid;
+  } catch (error: any) {
+    if (error.code == "auth/invalid-credential") {
+      throw new Error("El correo electrónico o contraseña no son válidos.");
     }
+
+    throw error;
   }
-  return data;
+};
+export const resetPassword = async (email: string): Promise<void> => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+  } catch (error: any) {
+    throw new Error(
+      "Error al enviar el correo de restablecimiento: " + error.message
+    );
+  }
 };
 
-export const registerUser = async (email: string, password: string) => {
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.signUp({
-    email: email,
-    password: password,
-  });
-  if (error instanceof AuthApiError) {
-    if (error.code === "user_already_exists") {
-      throw new Error("Usuario ya existe");
-    }
-  }
-  return session;
+export const logout = async (): Promise<void> => {
+  await signOut(auth);
+};
+
+export const onAuthStateChangedListener = (
+  callback: (user: User | null) => void
+): (() => void) => {
+  return onAuthStateChanged(auth, callback);
 };

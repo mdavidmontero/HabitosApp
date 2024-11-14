@@ -1,34 +1,32 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { supabase } from "../../config/supabase/supabase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { LoadingScreen } from "../components/shared/LoadingScreen";
-import { obtenerUsuarioPorId } from "../../actions/auth.actions";
+import { obtenerUsuarioPorId } from "../../actions/user.actions";
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const { setUser, setSession } = useAuthStore();
+  const auth = getAuth();
   const [loading, setLoading] = useState(false);
+
+  const { setUser } = useAuthStore();
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session!);
-    });
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setLoading(true);
+    setLoading(true);
+    const checkStatus = onAuthStateChanged(auth, async (currentUser) => {
       try {
-        obtenerUsuarioPorId(session?.user.id!).then((data) => {
-          if (data.length > 0) {
-            setUser(data[0]);
-          } else {
-            setUser(null);
-          }
-        });
+        const user = await obtenerUsuarioPorId(currentUser?.uid!);
+        if (user) {
+          setUser(user);
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         throw new Error("Error al obtener el usuario");
       }
       setLoading(false);
-      setSession(session!);
+      return () => checkStatus();
     });
   }, []);
-
   if (loading) {
     return <LoadingScreen />;
   }

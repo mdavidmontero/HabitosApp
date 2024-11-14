@@ -1,31 +1,25 @@
 import { useMutation } from "react-query";
-import { supabase } from "../../../config/supabase/supabase";
 import { registerUser } from "../../../actions/auth.actions";
-import { AuthApiError } from "@supabase/supabase-js";
-import { AlertError } from "../../components/shared/Alert";
+import { AlertError, AlertSuccess } from "../../components/shared/Alert";
 import { RegisterUser } from "../../../types";
 
-export const useRegisterUser = (user: RegisterUser, resetUser: () => void) => {
+export const useRegisterUser = (user: RegisterUser) => {
   return useMutation({
     mutationKey: ["register"],
-    mutationFn: () => registerUser(user.email, user.password),
-    onSuccess: async (session) => {
-      if (session) {
-        const datos = await supabase.from("users").insert({
-          name: user.name,
-          apellidos: user.apellidos,
-          telefono: user.telefono,
-          email: user.email,
-          idusuario: session.user.id,
-        });
-
-        if (datos.status == 201) {
-          resetUser();
-        }
-      }
+    mutationFn: () =>
+      registerUser(
+        user.nombres,
+        user.apellidos,
+        user.telefono,
+        user.correo,
+        user.password,
+        user.roles
+      ),
+    onSuccess: () => {
+      AlertSuccess("Usuario registrado correctamente");
     },
-    onError: (error: AuthApiError) => {
-      AlertError(error.message);
+    onError: (error: any) => {
+      AlertError("Error al registrar usuario: ");
     },
   });
 };

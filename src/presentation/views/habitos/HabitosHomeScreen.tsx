@@ -1,104 +1,85 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
-import React from "react";
-import {
-  Image,
-  Pressable,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Text, View } from "react-native";
 import { RootStackParamList } from "../../router/StackNavigator";
+import { MainLayout } from "../../layouts/MainLayout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CardsCustom from "../../components/shared/CardsCustom";
+import { FlatList } from "react-native-gesture-handler";
+import TitleCustom from "../../components/shared/TitleCustom";
 
 export const HabitosHomeScreen = () => {
-  const { width, height } = useWindowDimensions();
+  const { top } = useSafeAreaInsets();
   const navigation =
     useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
+
+  const data = [
+    "Realizar una rutina de meditación",
+    "Hacer ejercicio",
+    "Comer alimentos saludables",
+    "Darle un pequeño descanso",
+  ];
   return (
-    <View className="flex flex-row flex-wrap justify-between p-3">
-      {/* Ingreso de Habitos */}
-      <Pressable onPress={() => navigation.navigate("NewHabito")}>
-        <View
-          className="items-center justify-center m-2 bg-pink-500 shadow-lg rounded-2xl"
-          style={{
-            width: width * 0.42,
-            height: height * 0.25,
-          }}
-        >
-          <Image
-            style={{ width: 80, height: 80 }}
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/12192/12192697.png",
-            }}
-          />
-          <Text className="mt-3 text-lg font-bold text-center text-white">
-            Ingreso de Hábitos
-          </Text>
-        </View>
-      </Pressable>
+    <MainLayout style={{ paddingTop: top + 35 }}>
+      <Text className="my-4 text-2xl font-semibold text-center text-white ">
+        Hábitos
+      </Text>
+      <View className="z-10 flex-row flex-wrap items-center justify-center p-2 mx-5 bg-white rounded-3xl">
+        <CardsCustom
+          onPress={() => navigation.navigate("NewHabito")}
+          title="Nuevo Hábito"
+          subtitle="Empieza hoy mismo"
+          imagenUrl={require("../../../../assets/images/habito1.jpg")}
+        />
 
-      <Pressable onPress={() => navigation.navigate("CompletedHabito")}>
-        <View
-          className="items-center justify-center m-2 shadow-lg bg-amber-400 rounded-2xl"
+        <CardsCustom
+          onPress={() => navigation.navigate("CompletedHabito")}
           style={{
-            width: width * 0.42,
-            height: height * 0.25,
+            marginLeft: 10,
           }}
-        >
-          <Image
-            style={{ width: 80, height: 80 }}
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/12192/12192697.png",
-            }}
-          />
-          <Text className="mt-3 text-lg font-bold text-center text-white">
-            Listado Habitos
-          </Text>
-        </View>
-      </Pressable>
+          title="Habitos"
+          subtitle="Completar un hábito"
+          imagenUrl={require("../../../../assets/images/habito2.jpg")}
+        />
 
-      <Pressable onPress={() => console.log("Horas de Sueño")}>
-        <View
-          className="items-center justify-center m-2 bg-blue-400 shadow-lg rounded-2xl"
+        <CardsCustom
+          onPress={() => navigation.navigate("CompletedHabito")}
           style={{
-            width: width * 0.42,
-            height: height * 0.25,
+            marginTop: 30,
           }}
-        >
-          <Image
-            style={{ width: 80, height: 80 }}
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/12192/12192697.png",
-            }}
-          />
-          <Text className="mt-3 text-lg font-bold text-center text-white">
-            Horas de Sueño
-          </Text>
-        </View>
-      </Pressable>
+          title="Horas de Sueño"
+          subtitle="Calidad de sueño"
+          imagenUrl={require("../../../../assets/images/habito3.jpg")}
+        />
 
-      <Pressable onPress={() => console.log("Otro Hábito")}>
-        <View
-          className="items-center justify-center m-2 bg-green-500 shadow-lg rounded-2xl"
+        <CardsCustom
+          onPress={() => navigation.navigate("CompletedHabito")}
           style={{
-            width: width * 0.42,
-            height: height * 0.25,
+            marginTop: 30,
+            marginLeft: 10,
           }}
-        >
-          <Image
-            style={{ width: 80, height: 80 }}
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/12192/12192697.png",
-            }}
-          />
-          <Text className="mt-3 text-lg font-bold text-center text-white">
-            Otro Hábito
-          </Text>
-        </View>
-      </Pressable>
+          title="Otro Hábito"
+          subtitle="Otro Hábito"
+          imagenUrl={require("../../../../assets/images/habito4.jpg")}
+        />
+      </View>
+      <TitleCustom title="En Curso" />
+      <FlatList
+        className="z-10 mx-4 my-2 bg-white rounded-2xl"
+        data={data}
+        renderItem={({ item }) => <ListItem item={item} />}
+        keyExtractor={(item) => item.toString()}
+      />
+      Flat
+    </MainLayout>
+  );
+};
 
-      <Text className="w-full mt-4 text-xl font-semibold text-center text-gray-800">
-        En Curso
+export const ListItem = ({ item }: { item: string }) => {
+  return (
+    <View className=" m-2 bg-[#b2ebf2] shadow-lg border-l-4 border-[#1c849e] rounded-lg">
+      <Text className="p-2 ml-2 text-base font-bold text-start text-[#0f303d] ">
+        {item}
       </Text>
     </View>
   );

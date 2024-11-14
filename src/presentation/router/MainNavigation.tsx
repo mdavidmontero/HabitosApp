@@ -5,11 +5,10 @@ import DrawerNavigation from "./DrawerNavigation";
 
 const Stack = createStackNavigator();
 const MainNavigator = () => {
-  const { Session } = useAuthStore();
-
+  const { user } = useAuthStore();
   return (
     <Stack.Navigator>
-      {Session?.user ? (
+      {user?.roles === "CLIENTE" ? (
         <Stack.Screen
           name="Admin"
           component={DrawerNavigation}

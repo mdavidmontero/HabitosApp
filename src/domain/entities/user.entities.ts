@@ -1,11 +1,11 @@
 export interface User {
   id: string;
-  name: string;
+  nombres: string;
   apellidos: string;
   telefono: string;
-  email: string;
+  correo: string;
   password: string;
-  idusuario: string;
+  roles: RolUsuario;
 }
 
 export interface UserRegisro {
@@ -14,4 +14,10 @@ export interface UserRegisro {
   apellidos: string;
   telefono: string;
   correo: string;
+  roles: RolUsuario;
+}
+
+export enum RolUsuario {
+  ADMIN = "ADMIN",
+  CLIENTE = "CLIENTE",
 }

@@ -1,17 +1,20 @@
+import { Habito } from "../domain/entities/habitos.entities";
+import { RolUsuario } from "../domain/entities/user.entities";
+
 export type RegisterUser = {
-  name: string;
+  nombres: string;
   apellidos: string;
   telefono: string;
-  email: string;
+  correo: string;
   password: string;
-  idusuario: string;
+  roles: RolUsuario;
 };
 
 export const initialUserState: RegisterUser = {
-  name: "",
+  nombres: "",
   apellidos: "",
   telefono: "",
-  email: "",
+  correo: "",
   password: "",
-  idusuario: "",
+  roles: RolUsuario.CLIENTE,
 };

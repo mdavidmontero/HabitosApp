@@ -1,34 +1,33 @@
 import React from "react";
 import { View, FlatList, Text, Alert } from "react-native";
 import { Button, CheckBox } from "@ui-kitten/components"; // UI Kitten Components
-import { supabase } from "../../../config/supabase/supabase";
 import { useQuery, useQueryClient } from "react-query";
 import { useAuthStore } from "../../store/useAuthStore";
-import {
-  getHabitos,
-  getHabitosNotCompleted,
-  updateStreak,
-} from "../../../actions/habitos.actions";
+// import {
+//   getHabitos,
+//   getHabitosNotCompleted,
+//   updateStreak,
+// } from "../../../actions/habitos.actions";
 
 const CompletedHabitosScreen = () => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
 
-  const {
-    data: habitos,
-    error,
-    isLoading,
-  } = useQuery(
-    ["habitoscompleted", user?.id],
-    () => getHabitosNotCompleted(user?.id!),
-    {
-      enabled: !!user?.id,
-    }
-  );
+  // const {
+  //   data: habitos,
+  //   error,
+  //   isLoading,
+  // } = useQuery(
+  //   ["habitoscompleted", user?.id],
+  //   () => getHabitosNotCompleted(user?.id!),
+  //   {
+  //     enabled: !!user?.id,
+  //   }
+  // );
 
   const handleCompleteHabit = async (habitId: any) => {
     try {
-      await updateStreak(habitId, user?.id!);
+      // await updateStreak(habitId, user?.id!);
       queryClient.invalidateQueries("habitoscompleted");
       Alert.alert("Éxito", "Hábito completado correctamente");
     } catch (error) {
@@ -48,15 +47,15 @@ const CompletedHabitosScreen = () => {
     </View>
   );
 
-  if (isLoading) return <Text>Cargando...</Text>;
+  // if (isLoading) return <Text>Cargando...</Text>;
 
   return (
     <View className="p-4">
-      <FlatList
+      {/* <FlatList
         data={habitos}
         renderItem={renderHabit}
         keyExtractor={(item) => item.id.toString()}
-      />
+      /> */}
     </View>
   );
 };

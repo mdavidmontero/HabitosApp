@@ -13,7 +13,7 @@ export default function RegisterView() {
   const navigation =
     useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
 
-  const mutation = useRegisterUser(user, () => setUser(initialUserState));
+  const mutation = useRegisterUser(user);
 
   const handleRegister = () => {
     mutation.mutate();
@@ -32,8 +32,8 @@ export default function RegisterView() {
         <Input
           label="Nombres"
           placeholder="Juan"
-          value={user.name}
-          onChangeText={(text) => setUser({ ...user, name: text })}
+          value={user.nombres}
+          onChangeText={(text) => setUser({ ...user, nombres: text })}
           size="large"
           status="primary"
           keyboardType="default"
@@ -73,11 +73,11 @@ export default function RegisterView() {
         <Input
           label="Correo"
           placeholder="email@address.com"
-          value={user.email}
+          value={user.correo}
           onChangeText={(text) =>
             setUser({
               ...user,
-              email: text,
+              correo: text,
             })
           }
           size="large"

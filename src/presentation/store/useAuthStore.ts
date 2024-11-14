@@ -1,19 +1,16 @@
 import { create } from "zustand";
-import { User } from "../../domain/entities/user";
-import { Session } from "@supabase/supabase-js";
+import { User } from "../../domain/entities/user.entities";
 
-interface AuthStore {
-  Session: Session | null;
-  setSession: (session: Session) => void;
+interface userStore {
   user: User | null;
   setUser: (user: User | null) => void;
-  clearUser: () => void;
+  isFirstLaunch: boolean;
+  setIsFirstLaunch: (isFirstLaunch: boolean) => void;
 }
 
-export const useAuthStore = create<AuthStore>()((set) => ({
-  Session: null,
-  setSession: (session) => set({ Session: session }),
+export const useAuthStore = create<userStore>()((set) => ({
   user: null,
   setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null }),
+  isFirstLaunch: false,
+  setIsFirstLaunch: (isFirstLaunch) => set({ isFirstLaunch }),
 }));
