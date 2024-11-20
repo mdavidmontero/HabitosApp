@@ -8,7 +8,6 @@ import {
   User,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { FirebaseError } from "firebase/app";
 import { RolUsuario, UserRegisro } from "../domain/entities/user.entities";
 import { crearUsuario } from "./user.actions";
 
@@ -39,7 +38,6 @@ export const registerUser = async (
     await crearUsuario(usuario);
     return userCredential.user.uid;
   } catch (error: any) {
-    console.log(error);
     if (error.code === "auth/email-already-in-use") {
       throw new Error("El correo electrónico ya está en uso.");
     }

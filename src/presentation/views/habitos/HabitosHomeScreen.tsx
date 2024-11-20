@@ -26,7 +26,7 @@ export const HabitosHomeScreen = () => {
       </Text>
       <View className="z-10 flex-row flex-wrap items-center justify-center p-2 mx-5 bg-white rounded-3xl">
         <CardsCustom
-          onPress={() => navigation.navigate("NewHabito")}
+          onPress={() => navigation.navigate("ListHabitos")}
           title="Nuevo Hábito"
           subtitle="Empieza hoy mismo"
           imagenUrl={require("../../../../assets/images/habito1.jpg")}

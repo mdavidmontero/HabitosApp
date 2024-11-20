@@ -1,7 +1,7 @@
 import React from "react";
-import { View, FlatList, Text, Alert } from "react-native";
-import { Button, CheckBox } from "@ui-kitten/components"; // UI Kitten Components
-import { useQuery, useQueryClient } from "react-query";
+import { View, Text, Alert, StyleSheet } from "react-native";
+import { CheckBox } from "@ui-kitten/components";
+import { useQueryClient } from "react-query";
 import { useAuthStore } from "../../store/useAuthStore";
 // import {
 //   getHabitos,

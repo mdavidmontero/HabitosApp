@@ -1,26 +1,40 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   Pressable,
   Alert,
-  FlatList,
-  Platform,
   Modal,
   ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useHabitStore } from "../../store/useHabitStore";
-import { MainLayout } from "../../layouts/MainLayout";
-import { crearHabito } from "../../../actions/habitos.actions";
+import {
+  crearHabito,
+  getHabitoById,
+  updateHabito,
+} from "../../../actions/habitos.actions";
 import Day from "../../components/Day";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "../../router/StackNavigator";
+import { MainLayout } from "../../layouts/MainLayout";
+import { StackScreenProps } from "@react-navigation/stack";
 
-export const HabitosScreen = () => {
+interface Props {
+  modalVisible: boolean;
+  setModalVisible: (value: boolean) => void;
+}
+
+export const HabitoFormNewScreen = ({
+  modalVisible,
+  setModalVisible,
+}: Props) => {
+  const route = useRoute<RouteProp<RootStackParamList, "newHabbito">>();
+  const id = route.params?.habito;
   const user = useAuthStore((state) => state.user);
   const listDays = useHabitStore((state) => state.listDays);
   const [nombreHabito, setNombreHabito] = useState("");
@@ -29,11 +43,11 @@ export const HabitosScreen = () => {
   const [reminderTime, setReminderTime] = useState("5");
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingHabitId, setEditingHabitId] = useState<number | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const navigation =
+    useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
   const { top } = useSafeAreaInsets();
   const queryClient = useQueryClient();
+  console.log(nombreHabito, descripcion, startTime, reminderTime, selectedDays);
 
   const handleDay = (day: { id: number }) => {
     const isSelected = selectedDays.includes(day.id);
@@ -45,6 +59,20 @@ export const HabitosScreen = () => {
       setSelectedDays([...selectedDays, day.id]);
     }
   };
+
+  const { data } = useQuery({
+    queryKey: ["habito", id],
+    queryFn: () => getHabitoById(id!),
+    enabled: !!id,
+  });
+  useEffect(() => {
+    if (data?.id) {
+      setNombreHabito(data?.nombre);
+      setDescripcion(data?.descripcion);
+      setReminderTime(data?.reminder_time!.toString());
+      setSelectedDays(data?.days);
+    }
+  }, [data, id]);
 
   const handleGuardarHabito = async () => {
     if (
@@ -72,7 +100,7 @@ export const HabitosScreen = () => {
       return;
     }
 
-    try {
+    if (id === "") {
       await crearHabito({
         id: "",
         nombre: nombreHabito,
@@ -85,9 +113,19 @@ export const HabitosScreen = () => {
       Alert.alert("Éxito", "Hábito guardado correctamente");
       queryClient.invalidateQueries("habitos");
       resetForm();
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Error", "No se pudo guardar el hábito");
+      navigation.navigate("ListHabitos");
+    } else {
+      await updateHabito(id!, {
+        nombre: nombreHabito,
+        descripcion,
+        reminder_time: parsedReminderTime,
+        days: selectedDays,
+      });
+      Alert.alert("Éxito", "Hábito actualizado correctamente");
+      queryClient.invalidateQueries(["habito", id]);
+      queryClient.invalidateQueries("habitos");
+      resetForm();
+      navigation.navigate("ListHabitos");
     }
   };
 
@@ -102,105 +140,95 @@ export const HabitosScreen = () => {
     setDescripcion("");
     setReminderTime("5");
     setStartTime(new Date());
-    setIsEditing(false);
-    setEditingHabitId(null);
     setSelectedDays([]);
     setModalVisible(false);
   };
 
   return (
     <MainLayout style={{ paddingTop: top + 40 }}>
-      <View>
+      <View className="z-10 flex-1 p-6 ">
+        <Text className="text-2xl font-bold text-center text-teal-800">
+          {data?.id ? "Editar Hábito" : "Agregar Hábito"}
+        </Text>
+        <TextInput
+          className="p-4 mt-4 mb-4 text-black bg-white border border-[#1fa3bb] rounded-full shadow-sm focus:border-teal-500"
+          placeholder="Nombre del Hábito"
+          value={nombreHabito}
+          onChangeText={setNombreHabito}
+        />
+        <TextInput
+          className="p-4 mb-4 text-black bg-white border border-[#1fa3bb] rounded-full shadow-sm focus:border-teal-500"
+          placeholder="Descripción"
+          value={descripcion}
+          onChangeText={setDescripcion}
+          multiline
+        />
         <Pressable
-          onPress={() => setModalVisible(true)}
-          className="absolute right-0 p-3 mx-4 bg-white rounded-full shadow-md"
+          className="p-4 mb-4 bg-white border border-[#1fa3bb] rounded-full shadow-sm"
+          onPress={() => setShowTimePicker(true)}
         >
-          <AntDesign name="pluscircleo" size={24} color="#2563eb" />
+          <Text className="text-black">
+            {startTime
+              ? startTime.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "Seleccionar Hora de Inicio"}
+          </Text>
         </Pressable>
-
-        <Modal
-          transparent={false}
-          visible={modalVisible}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
+        <TextInput
+          className="p-4 mb-4 text-black bg-white border border-[#1fa3bb] rounded-full shadow-sm focus:border-teal-500"
+          placeholder="Tiempo de Recordatorio (minutos)"
+          value={reminderTime}
+          onChangeText={setReminderTime}
+          keyboardType="numeric"
+        />
+        <Text className="text-lg font-semibold text-center text-teal-800">
+          Días de Hábito
+        </Text>
+        <View className="flex flex-row flex-wrap justify-center mt-2">
+          {listDays.map((day) => (
+            <Day
+              key={day.id}
+              day={day}
+              handleDay={handleDay}
+              isSelected={selectedDays.includes(day.id)}
+            />
+          ))}
+        </View>
+        <Pressable
+          onPress={handleGuardarHabito}
+          disabled={
+            !nombreHabito ||
+            !startTime ||
+            !reminderTime ||
+            !user?.id ||
+            selectedDays.length === 0
+          }
+          className="px-4 py-3 mt-6 mb-3 text-white bg-teal-700 rounded-full shadow-lg disabled:bg-gray-400"
         >
-          <ScrollView className="flex-1 p-6 bg-[#b2ebf2]">
-            <Text className="text-2xl font-bold text-center text-teal-800">
-              {isEditing ? "Editar Hábito" : "Agregar Hábito"}
-            </Text>
-            <TextInput
-              className="p-4 mt-4 mb-4 text-black bg-white border border-[#1fa3bb] rounded-full shadow-sm focus:border-teal-500"
-              placeholder="Nombre del Hábito"
-              value={nombreHabito}
-              onChangeText={setNombreHabito}
-            />
-            <TextInput
-              className="p-4 mb-4 text-black bg-white border border-[#1fa3bb] rounded-full shadow-sm focus:border-teal-500"
-              placeholder="Descripción"
-              value={descripcion}
-              onChangeText={setDescripcion}
-              multiline
-            />
-            <Pressable
-              className="p-4 mb-4 bg-white border border-[#1fa3bb] rounded-full shadow-sm"
-              onPress={() => setShowTimePicker(true)}
-            >
-              <Text className="text-black">
-                {startTime
-                  ? startTime.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "Seleccionar Hora de Inicio"}
-              </Text>
-            </Pressable>
-            <TextInput
-              className="p-4 mb-4 text-black bg-white border border-[#1fa3bb] rounded-full shadow-sm focus:border-teal-500"
-              placeholder="Tiempo de Recordatorio (minutos)"
-              value={reminderTime}
-              onChangeText={setReminderTime}
-              keyboardType="numeric"
-            />
-            <Text className="text-lg font-semibold text-center text-teal-800">
-              Días de Hábito
-            </Text>
-            <View className="flex flex-row flex-wrap justify-center mt-2">
-              {listDays.map((day) => (
-                <Day
-                  key={day.id}
-                  day={day}
-                  handleDay={handleDay}
-                  isSelected={selectedDays.includes(day.id)}
-                />
-              ))}
-            </View>
-            <Pressable
-              onPress={handleGuardarHabito}
-              disabled={
-                !nombreHabito ||
-                !startTime ||
-                !reminderTime ||
-                !user?.id ||
-                selectedDays.length === 0
-              }
-              className="px-4 py-3 mt-6 mb-10 text-white bg-teal-700 rounded-full shadow-lg"
-            >
-              <Text className="text-base font-bold text-center text-white">
-                Guardar
-              </Text>
-            </Pressable>
-            {showTimePicker && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={startTime}
-                mode="time"
-                is24Hour={true}
-                display="default"
-                onChange={onChangeHora}
-              />
-            )}
-          </ScrollView>
-        </Modal>
+          <Text className="text-base font-bold text-center text-white">
+            Guardar
+          </Text>
+        </Pressable>
+        <Pressable
+          onLongPress={() => navigation.goBack()}
+          className="px-4 py-3 mt-6 mb-10 text-white bg-red-700 rounded-full shadow-lg disabled:bg-gray-400"
+        >
+          <Text className="text-base font-bold text-center text-white">
+            Cerrar
+          </Text>
+        </Pressable>
+        {showTimePicker && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={startTime}
+            mode="time"
+            is24Hour={true}
+            display="default"
+            onChange={onChangeHora}
+          />
+        )}
       </View>
     </MainLayout>
   );

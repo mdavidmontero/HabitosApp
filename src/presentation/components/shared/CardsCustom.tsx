@@ -1,5 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   ImageBackground,
@@ -11,7 +9,6 @@ import {
   ViewStyle,
   GestureResponderEvent,
 } from "react-native";
-import { RootStackParamList } from "../../router/StackNavigator";
 
 interface Props {
   title: string;
@@ -28,8 +25,6 @@ export default function CardsCustom({
   onPress,
 }: Props) {
   const { width, height } = useWindowDimensions();
-  const navigation =
-    useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
   return (
     <Pressable onPress={onPress} style={style}>
       <ImageBackground

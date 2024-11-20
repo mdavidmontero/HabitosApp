@@ -1,13 +1,4 @@
-import React from "react";
-import {
-  Text,
-  View,
-  Image,
-  SafeAreaView,
-  useWindowDimensions,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
+import { View, Image, StyleProp, ViewStyle } from "react-native";
 
 interface Props {
   children: React.ReactNode;
