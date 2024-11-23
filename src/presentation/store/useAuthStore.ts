@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { User } from "../../domain/entities/user.entities";
+import { User, UserPermisos } from "../../domain/entities/user.entities";
 
 interface userStore {
-  user: User | null;
-  setUser: (user: User | null) => void;
+  user: UserPermisos | null;
+  setUser: (user: UserPermisos | null) => void;
   isFirstLaunch: boolean;
   setIsFirstLaunch: (isFirstLaunch: boolean) => void;
 }

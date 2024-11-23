@@ -33,7 +33,7 @@ export const HabitosHomeScreen = () => {
       <Text className="my-4 text-2xl font-semibold text-center text-white ">
         Hábitos
       </Text>
-      <View className="z-10 flex-row flex-wrap items-center justify-center p-2 mx-5 bg-white rounded-3xl">
+      <View className="flex-row flex-wrap items-center justify-center p-2 mx-5 bg-white  rounded-3xl">
         <CardsCustom
           onPress={() => navigation.navigate("ListHabitos")}
           title="Nuevo Hábito"
@@ -68,6 +68,16 @@ export const HabitosHomeScreen = () => {
             marginLeft: 10,
           }}
           title="Otro Hábito"
+          subtitle="Otro Hábito"
+          imagenUrl={require("../../../../assets/images/habito4.jpg")}
+        />
+        <CardsCustom
+          onPress={() => navigation.navigate("HomeActivityCaloriesScreen")}
+          style={{
+            marginTop: 30,
+            marginLeft: 10,
+          }}
+          title="Calcular Calorias"
           subtitle="Otro Hábito"
           imagenUrl={require("../../../../assets/images/habito4.jpg")}
         />

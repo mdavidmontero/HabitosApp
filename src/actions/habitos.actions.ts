@@ -61,7 +61,7 @@ export const updateHabito = async (
 ): Promise<void> => {
   try {
     await updateDoc(doc(habitosRef, id), newHabito);
-    console.log("Habito actualizado correctamente");
+    ("Habito actualizado correctamente");
   } catch (error) {
     console.error("Error al actualizar hábito:", error);
     throw error;
@@ -78,8 +78,6 @@ export const marcarCompletado = async (id: string): Promise<void> => {
     await updateDoc(docRef, {
       completed: !isCompleted,
     });
-
-    console.log(`Habito actualizado correctamente`);
   } catch (error) {
     console.error("Error al alternar el estado del hábito:", error);
     throw error;
@@ -121,7 +119,6 @@ export const saveStepsToFirebase = async (
   try {
     await setDoc(doc(db, "steps", today), stepsData);
     await AsyncStorage.removeItem(`steps-${today}`);
-    console.log("Steps saved to Firebase successfully.");
   } catch (error) {
     console.error("Error saving steps to Firebase: ", error);
     throw new Error("Failed to save steps to Firebase.");
@@ -146,9 +143,7 @@ export const saveStepsToNewCollection = async (
       collection(db, "newStepsCollection"),
       stepsData
     );
-    console.log("Steps saved to new collection with ID: ", docRef.id);
   } catch (error) {
-    console.error("Error saving steps to new collection: ", error);
     throw new Error("Failed to save steps to new collection.");
   }
 };

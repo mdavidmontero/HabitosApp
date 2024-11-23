@@ -4,7 +4,7 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { Image } from "react-native";
+import { Image, Pressable } from "react-native";
 import StackNavigator, { RootStackParamList } from "./StackNavigator";
 import {
   useWindowDimensions,
@@ -60,17 +60,23 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   return (
     <DrawerContentScrollView {...props}>
       <View className="items-center justify-center h-24 mt-10 mb-5 rounded-full">
-        <Image
-          source={require("../../../assets/images/habito2.jpg")}
-          style={{
-            width: 150,
-            height: 150,
-            borderRadius: 100,
-            borderWidth: 2,
-            borderColor: "#1fa3bb",
-            marginBottom: 10,
-          }}
-        />
+        <Pressable onPress={() => navigation.navigate("ProfileScreen")}>
+          <Image
+            source={
+              user?.photoProfile
+                ? { uri: user.photoProfile }
+                : require("../../../assets/images/habito2.jpg")
+            }
+            style={{
+              width: 150,
+              height: 150,
+              borderRadius: 100,
+              borderWidth: 2,
+              borderColor: "#1fa3bb",
+              marginBottom: 10,
+            }}
+          />
+        </Pressable>
       </View>
 
       <View className="items-center mb-5">
@@ -83,21 +89,21 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
       <View className="flex-1 px-3 mt-2">
         <DrawerItemList {...props} />
         <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.navigate("DailyHabitsScreen")}
           className="px-4 py-3 my-2 rounded"
         >
           <View className="flex-row items-center gap-2">
-            <Text className="text-base font-bold text-white">Historial</Text>
+            <Text className="text-base font-bold text-white">Mis Habitos</Text>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.navigate("HomeActivityCaloriesScreen")}
           className="px-4 py-3 my-2 rounded"
         >
           <View className="flex-row items-center gap-2">
             <Text className="text-base font-bold text-white">
-              Instrucciones
+              Contador Calorias
             </Text>
           </View>
         </TouchableOpacity>

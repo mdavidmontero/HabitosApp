@@ -1,4 +1,4 @@
-import { View, Image, StyleProp, ViewStyle } from "react-native";
+import { View, Image, StyleProp, ViewStyle, ScrollView } from "react-native";
 
 interface Props {
   children: React.ReactNode;
@@ -29,7 +29,7 @@ export const MainLayout = ({ children, style }: Props) => {
             objectFit: "fill",
           }}
         />
-        {children}
+        <ScrollView className="z-10">{children}</ScrollView>
       </View>
       <Image
         source={require("../../../assets/images/Figure_Abajo.png")}

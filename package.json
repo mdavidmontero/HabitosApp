@@ -34,9 +34,12 @@
     "react-native-screens": "~4.0.0",
     "react-native-svg": "15.8.0",
     "react-native-url-polyfill": "^2.0.0",
+    "react-native-uuid": "^2.0.3",
     "react-query": "^3.39.3",
     "toastify-react-native": "^5.0.2",
-    "zustand": "^5.0.0"
+    "zustand": "^5.0.0",
+    "@react-native-picker/picker": "2.9.0",
+    "expo-image-picker": "~16.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

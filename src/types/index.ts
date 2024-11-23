@@ -1,4 +1,3 @@
-import { Habito } from "../domain/entities/habitos.entities";
 import { RolUsuario } from "../domain/entities/user.entities";
 
 export type RegisterUser = {
@@ -17,4 +16,16 @@ export const initialUserState: RegisterUser = {
   correo: "",
   password: "",
   roles: RolUsuario.CLIENTE,
+};
+
+export type Category = {
+  id: number;
+  name: string;
+};
+
+export type Activity = {
+  id: string;
+  category: number;
+  name: string;
+  calories: number;
 };

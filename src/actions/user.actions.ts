@@ -1,21 +1,19 @@
 import {
   getAuth,
-  deleteUser,
   createUserWithEmailAndPassword,
   UserCredential,
 } from "firebase/auth";
 import {
-  collection,
   DocumentData,
   doc,
   setDoc,
   updateDoc,
   DocumentSnapshot,
-  CollectionReference,
   getDoc,
 } from "firebase/firestore";
-import { db } from "../config/firebase/app";
+import { db, storage } from "../config/firebase/app";
 import { User, UserRegisro } from "../domain/entities/user.entities";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export async function crearUsuario(usuario: UserRegisro): Promise<void> {
   try {
@@ -26,6 +24,27 @@ export async function crearUsuario(usuario: UserRegisro): Promise<void> {
     throw error;
   }
 }
+
+export const uploadImage = async (image: string): Promise<string> => {
+  try {
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const storageRef = ref(
+      storage,
+      `decorations/${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+    );
+
+    await uploadBytes(storageRef, blob);
+
+    const url = await getDownloadURL(storageRef);
+
+    return url;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw error;
+  }
+};
 
 export async function crearUsuarioYAutenticacion(
   usuario: User,
@@ -87,8 +106,12 @@ export async function actualizarUsuario(
   try {
     const userDocRef = doc(db, "usuarios", userId);
     const userDocSnap = await getDoc(userDocRef);
+    const imageUrl = await uploadImage(newData.photoProfile || "");
     if (userDocSnap.exists()) {
-      await updateDoc(userDocRef, newData);
+      await updateDoc(userDocRef, {
+        ...newData,
+        photoProfile: imageUrl,
+      });
     } else {
       console.error("No se encontró el usuario con el ID:", userId);
       throw new Error("Usuario no encontrado");
