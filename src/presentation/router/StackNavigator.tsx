@@ -6,6 +6,8 @@ import CompletedHabitosScreen from "../views/habitos/CompletedHabitos";
 import { HistoryHabitos } from "../views/habitos/HistoryHabitos";
 import { ListHabitosScreen } from "../views/habitos/ListHabitosScreen";
 import { DailyHabitsScreen } from "../views/habitos/TodayHabitScreen";
+import PedometerScreen from "../views/utilities/PedometerScreen";
+import SleepTrackerScreen from "../views/utilities/SleepTrackerScreen";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -16,6 +18,8 @@ export type RootStackParamList = {
   HistoryHabitos: undefined;
   newHabbito: { habito?: string };
   DailyHabitsScreen: undefined;
+  PedometerScreen: undefined;
+  SleepTrackerScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -31,6 +35,8 @@ function StackNavigator() {
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="HistoryHabitos" component={HistoryHabitos} />
       <Stack.Screen name="DailyHabitsScreen" component={DailyHabitsScreen} />
+      <Stack.Screen name="PedometerScreen" component={PedometerScreen} />
+      <Stack.Screen name="SleepTrackerScreen" component={SleepTrackerScreen} />
     </Stack.Navigator>
   );
 }

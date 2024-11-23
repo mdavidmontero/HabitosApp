@@ -8,7 +8,7 @@ export const useHabitos = () => {
   const user = useAuthStore((state) => state.user);
   const habitosNotCompleted = useQuery({
     queryKey: ["habitosnotCompleted"],
-    queryFn: () => getHabitosCompletados(user?.id!, todayDate),
+    queryFn: () => getHabitosCompletados(user?.id!),
   });
 
   return {

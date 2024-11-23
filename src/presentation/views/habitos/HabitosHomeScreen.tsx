@@ -18,10 +18,12 @@ export const HabitosHomeScreen = () => {
   const { habitosNotCompleted } = useHabitos();
   const currentDay = new Date().getDay();
   useEffect(() => {
-    const habitosHoy = habitosNotCompleted.data!.filter((habito) =>
-      habito.days.includes(currentDay)
-    );
-    setHabitosDayt(habitosHoy);
+    if (habitosNotCompleted.data) {
+      const habitosHoy = habitosNotCompleted.data!.filter((habito) =>
+        habito.days.includes(currentDay)
+      );
+      setHabitosDayt(habitosHoy);
+    }
   }, [habitosNotCompleted.data]);
 
   const navigation =
@@ -50,7 +52,7 @@ export const HabitosHomeScreen = () => {
         />
 
         <CardsCustom
-          onPress={() => navigation.navigate("CompletedHabito")}
+          onPress={() => navigation.navigate("SleepTrackerScreen")}
           style={{
             marginTop: 30,
           }}
@@ -60,7 +62,7 @@ export const HabitosHomeScreen = () => {
         />
 
         <CardsCustom
-          onPress={() => navigation.navigate("CompletedHabito")}
+          onPress={() => navigation.navigate("PedometerScreen")}
           style={{
             marginTop: 30,
             marginLeft: 10,
@@ -72,8 +74,12 @@ export const HabitosHomeScreen = () => {
       </View>
       <TitleCustom title="En Curso" />
 
-      {habitosNotCompleted.isLoading ? (
-        <ActivityIndicator size="large" color="#2563eb" />
+      {habitosDay.length === 0 ? (
+        <View className="z-10 items-center justify-center p-2 mx-5 my-3 bg-white rounded-2xl">
+          <Text className="text-lg  text-center text-[#1d7c8d] font-black">
+            No tienes hábitos hoy
+          </Text>
+        </View>
       ) : (
         <FlatList
           className="z-10 mx-4 my-2 bg-white rounded-2xl"

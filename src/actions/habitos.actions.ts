@@ -12,6 +12,10 @@ import {
   DocumentData,
   query,
 } from "firebase/firestore";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { format } from "date-fns";
+
 import { db } from "../config/firebase/app";
 import { Habito } from "../domain/entities/habitos.entities";
 
@@ -64,28 +68,18 @@ export const updateHabito = async (
   }
 };
 
-export const marcarCompletado = async (
-  id: string,
-  date: string
-): Promise<void> => {
+export const marcarCompletado = async (id: string): Promise<void> => {
   try {
     const docRef = doc(habitosRef, id);
     const habito = (await getDoc(docRef)).data() as Habito;
 
-    const isCompleted = habito.completed?.[date];
-    if (isCompleted) {
-      const { [date]: _, ...resto } = habito.completed || {};
-      await updateDoc(docRef, {
-        completed: resto,
-      });
-    } else {
-      await updateDoc(docRef, {
-        completed: {
-          ...habito.completed,
-          [date]: true,
-        },
-      });
-    }
+    const isCompleted = habito.completed || false;
+
+    await updateDoc(docRef, {
+      completed: !isCompleted,
+    });
+
+    console.log(`Habito actualizado correctamente`);
   } catch (error) {
     console.error("Error al alternar el estado del hábito:", error);
     throw error;
@@ -93,8 +87,7 @@ export const marcarCompletado = async (
 };
 
 export const getHabitosCompletados = async (
-  userId: string,
-  date: string
+  userId: string
 ): Promise<Habito[]> => {
   try {
     const querySnapshot = await getDocs(
@@ -103,11 +96,59 @@ export const getHabitosCompletados = async (
 
     const habitos = querySnapshot.docs
       .map((doc) => ({ id: doc.id, ...doc.data() } as Habito))
-      .filter((habito) => habito.completed?.[date] === false);
+      .filter((habito) => habito.completed === false);
 
     return habitos;
   } catch (error) {
     console.error("Error al obtener hábitos completados:", error);
     throw error;
+  }
+};
+
+export const saveStepsToFirebase = async (
+  pastStepCount: number,
+  currentStepCount: number,
+  userId: string
+) => {
+  const today = format(new Date(), "yyyy-MM-dd");
+  const stepsData = {
+    date: today,
+    pastStepCount,
+    currentStepCount,
+    user_id: userId,
+  };
+
+  try {
+    await setDoc(doc(db, "steps", today), stepsData);
+    await AsyncStorage.removeItem(`steps-${today}`);
+    console.log("Steps saved to Firebase successfully.");
+  } catch (error) {
+    console.error("Error saving steps to Firebase: ", error);
+    throw new Error("Failed to save steps to Firebase.");
+  }
+};
+
+// Guarda los pasos en una nueva colección de Firebase con timestamp
+export const saveStepsToNewCollection = async (
+  pastStepCount: number,
+  currentStepCount: number
+) => {
+  const today = format(new Date(), "yyyy-MM-dd");
+  const stepsData = {
+    date: today,
+    pastStepCount,
+    currentStepCount,
+    timestamp: new Date().toISOString(),
+  };
+
+  try {
+    const docRef = await addDoc(
+      collection(db, "newStepsCollection"),
+      stepsData
+    );
+    console.log("Steps saved to new collection with ID: ", docRef.id);
+  } catch (error) {
+    console.error("Error saving steps to new collection: ", error);
+    throw new Error("Failed to save steps to new collection.");
   }
 };

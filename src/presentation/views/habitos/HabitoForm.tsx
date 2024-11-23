@@ -30,6 +30,7 @@ export const HabitoFormNewScreen = ({}: Props) => {
   const [nombreHabito, setNombreHabito] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [startTime, setStartTime] = useState(new Date());
+  const [completed, setCompleted] = useState<boolean>(false);
   const [reminderTime, setReminderTime] = useState("5");
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -38,7 +39,6 @@ export const HabitoFormNewScreen = ({}: Props) => {
     useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
   const { top } = useSafeAreaInsets();
   const queryClient = useQueryClient();
-  console.log(nombreHabito, descripcion, startTime, reminderTime, selectedDays);
 
   const handleDay = (day: { id: number }) => {
     const isSelected = selectedDays.includes(day.id);
@@ -62,6 +62,7 @@ export const HabitoFormNewScreen = ({}: Props) => {
       setDescripcion(data?.descripcion);
       setReminderTime(data?.reminder_time!.toString());
       setSelectedDays(data?.days);
+      setCompleted(data?.completed);
     }
   }, [data, id]);
 
@@ -100,9 +101,7 @@ export const HabitoFormNewScreen = ({}: Props) => {
         reminder_time: parsedReminderTime,
         user_id: user.id,
         days: selectedDays,
-        completed: {
-          [todayDate]: false,
-        },
+        completed: false,
       });
       Alert.alert("Éxito", "Hábito guardado correctamente");
       queryClient.invalidateQueries("habitos");
@@ -114,13 +113,12 @@ export const HabitoFormNewScreen = ({}: Props) => {
         descripcion,
         reminder_time: parsedReminderTime,
         days: selectedDays,
-        completed: {
-          [todayDate]: false,
-        },
+        completed: completed,
       });
       Alert.alert("Éxito", "Hábito actualizado correctamente");
       queryClient.invalidateQueries(["habito", id]);
       queryClient.invalidateQueries("habitos");
+      queryClient.invalidateQueries("habitosnotCompleted");
       resetForm();
       navigation.navigate("ListHabitos");
     }
