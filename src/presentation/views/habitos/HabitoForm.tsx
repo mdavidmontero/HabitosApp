@@ -1,13 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  Alert,
-  Modal,
-  ScrollView,
-} from "react-native";
+import { format } from "date-fns";
+import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useHabitStore } from "../../store/useHabitStore";
@@ -18,7 +11,7 @@ import {
 } from "../../../actions/habitos.actions";
 import Day from "../../components/Day";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../router/StackNavigator";
 import { MainLayout } from "../../layouts/MainLayout";
@@ -29,10 +22,7 @@ interface Props {
   setModalVisible: (value: boolean) => void;
 }
 
-export const HabitoFormNewScreen = ({
-  modalVisible,
-  setModalVisible,
-}: Props) => {
+export const HabitoFormNewScreen = ({}: Props) => {
   const route = useRoute<RouteProp<RootStackParamList, "newHabbito">>();
   const id = route.params?.habito;
   const user = useAuthStore((state) => state.user);
@@ -43,6 +33,7 @@ export const HabitoFormNewScreen = ({
   const [reminderTime, setReminderTime] = useState("5");
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const todayDate = format(new Date(), "yyyy-MM-dd");
   const navigation =
     useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
   const { top } = useSafeAreaInsets();
@@ -109,6 +100,9 @@ export const HabitoFormNewScreen = ({
         reminder_time: parsedReminderTime,
         user_id: user.id,
         days: selectedDays,
+        completed: {
+          [todayDate]: false,
+        },
       });
       Alert.alert("Éxito", "Hábito guardado correctamente");
       queryClient.invalidateQueries("habitos");
@@ -120,6 +114,9 @@ export const HabitoFormNewScreen = ({
         descripcion,
         reminder_time: parsedReminderTime,
         days: selectedDays,
+        completed: {
+          [todayDate]: false,
+        },
       });
       Alert.alert("Éxito", "Hábito actualizado correctamente");
       queryClient.invalidateQueries(["habito", id]);
@@ -141,7 +138,6 @@ export const HabitoFormNewScreen = ({
     setReminderTime("5");
     setStartTime(new Date());
     setSelectedDays([]);
-    setModalVisible(false);
   };
 
   return (

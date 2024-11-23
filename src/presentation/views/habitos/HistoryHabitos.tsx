@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { useQuery } from "react-query";
 import { getHabitosByUser } from "../../../actions/habitos.actions";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -7,27 +7,29 @@ import { Habito } from "../../../domain/entities/habitos.entities";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../router/StackNavigator";
-import { useState } from "react";
-import { HabitoFormNewScreen } from "./HabitoForm";
 
 export const HistoryHabitos = () => {
   const user = useAuthStore((state) => state.user);
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["habitos"],
     queryFn: () => getHabitosByUser(user?.id!),
   });
-  console.log(data);
   return (
     <View className="flex items-center justify-center mt-5">
       <Text className="text-xl font-bold text-center text-white">
         Listado de Habitos
       </Text>
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <ListItem item={item} />}
-        className="w-full p-2"
-      />
+
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#2563eb" />
+      ) : (
+        <FlatList
+          data={data}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <ListItem item={item} />}
+          className="w-full p-2"
+        />
+      )}
     </View>
   );
 };
@@ -35,13 +37,11 @@ export const HistoryHabitos = () => {
 const ListItem = ({ item }: { item: Habito }) => {
   const navigation =
     useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
-  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <>
       <Pressable
         onPress={() => {
-          setModalVisible(true);
           navigation.navigate("newHabbito", { habito: item.id });
         }}
       >

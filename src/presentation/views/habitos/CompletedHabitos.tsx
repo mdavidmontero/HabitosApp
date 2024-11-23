@@ -1,61 +1,29 @@
 import React from "react";
-import { View, Text, Alert, StyleSheet } from "react-native";
+import { View, Text, Alert, StyleSheet, FlatList } from "react-native";
 import { CheckBox } from "@ui-kitten/components";
-import { useQueryClient } from "react-query";
-import { useAuthStore } from "../../store/useAuthStore";
-// import {
-//   getHabitos,
-//   getHabitosNotCompleted,
-//   updateStreak,
-// } from "../../../actions/habitos.actions";
+import { useHabitos } from "../../hooks/habitos/useHabitos";
 
 const CompletedHabitosScreen = () => {
-  const { user } = useAuthStore();
-  const queryClient = useQueryClient();
-
-  // const {
-  //   data: habitos,
-  //   error,
-  //   isLoading,
-  // } = useQuery(
-  //   ["habitoscompleted", user?.id],
-  //   () => getHabitosNotCompleted(user?.id!),
-  //   {
-  //     enabled: !!user?.id,
-  //   }
-  // );
-
-  const handleCompleteHabit = async (habitId: any) => {
-    try {
-      // await updateStreak(habitId, user?.id!);
-      queryClient.invalidateQueries("habitoscompleted");
-      Alert.alert("Éxito", "Hábito completado correctamente");
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "No se pudo completar el hábito");
-    }
-  };
+  const { habitosNotCompleted } = useHabitos();
 
   const renderHabit = ({ item }: any) => (
     <View className="flex flex-row items-center mb-4">
       <CheckBox
         checked={item.completed}
-        onChange={() => handleCompleteHabit(item.id)}
+        onChange={() => {}}
         style={{ marginRight: 8 }}
       />
       <Text className="text-lg">{item.name}</Text>
     </View>
   );
 
-  // if (isLoading) return <Text>Cargando...</Text>;
-
   return (
     <View className="p-4">
-      {/* <FlatList
-        data={habitos}
+      <FlatList
+        data={habitosNotCompleted.data}
         renderItem={renderHabit}
         keyExtractor={(item) => item.id.toString()}
-      /> */}
+      />
     </View>
   );
 };

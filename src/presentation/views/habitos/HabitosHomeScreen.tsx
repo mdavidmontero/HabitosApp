@@ -1,24 +1,31 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { RootStackParamList } from "../../router/StackNavigator";
 import { MainLayout } from "../../layouts/MainLayout";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CardsCustom from "../../components/shared/CardsCustom";
 import { FlatList } from "react-native-gesture-handler";
 import TitleCustom from "../../components/shared/TitleCustom";
+import { useHabitos } from "../../hooks/habitos/useHabitos";
+import { ListItem } from "../../components/shared/RenderItem";
+import { useEffect, useState } from "react";
+import { Habito } from "../../../domain/entities/habitos.entities";
 
 export const HabitosHomeScreen = () => {
   const { top } = useSafeAreaInsets();
+  const [habitosDay, setHabitosDayt] = useState<Habito[]>([]);
+  const { habitosNotCompleted } = useHabitos();
+  const currentDay = new Date().getDay();
+  useEffect(() => {
+    const habitosHoy = habitosNotCompleted.data!.filter((habito) =>
+      habito.days.includes(currentDay)
+    );
+    setHabitosDayt(habitosHoy);
+  }, [habitosNotCompleted.data]);
+
   const navigation =
     useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
-
-  const data = [
-    "Realizar una rutina de meditación",
-    "Hacer ejercicio",
-    "Comer alimentos saludables",
-    "Darle un pequeño descanso",
-  ];
   return (
     <MainLayout style={{ paddingTop: top + 35 }}>
       <Text className="my-4 text-2xl font-semibold text-center text-white ">
@@ -33,7 +40,7 @@ export const HabitosHomeScreen = () => {
         />
 
         <CardsCustom
-          onPress={() => navigation.navigate("CompletedHabito")}
+          onPress={() => navigation.navigate("DailyHabitsScreen")}
           style={{
             marginLeft: 10,
           }}
@@ -64,23 +71,17 @@ export const HabitosHomeScreen = () => {
         />
       </View>
       <TitleCustom title="En Curso" />
-      <FlatList
-        className="z-10 mx-4 my-2 bg-white rounded-2xl"
-        data={data}
-        renderItem={({ item }) => <ListItem item={item} />}
-        keyExtractor={(item) => item.toString()}
-      />
-      Flat
-    </MainLayout>
-  );
-};
 
-export const ListItem = ({ item }: { item: string }) => {
-  return (
-    <View className=" m-2 bg-[#b2ebf2] shadow-lg border-l-4 border-[#1c849e] rounded-lg">
-      <Text className="p-2 ml-2 text-base font-bold text-start text-[#0f303d] ">
-        {item}
-      </Text>
-    </View>
+      {habitosNotCompleted.isLoading ? (
+        <ActivityIndicator size="large" color="#2563eb" />
+      ) : (
+        <FlatList
+          className="z-10 mx-4 my-2 bg-white rounded-2xl"
+          data={habitosDay}
+          renderItem={({ item }) => <ListItem item={item} />}
+          keyExtractor={(item) => item.id}
+        />
+      )}
+    </MainLayout>
   );
 };

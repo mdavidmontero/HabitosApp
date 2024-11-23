@@ -6,4 +6,5 @@ export interface Habito {
   reminder_time: number;
   user_id: string | null;
   days: number[];
+  completed?: Record<string, boolean>;
 }

@@ -63,3 +63,51 @@ export const updateHabito = async (
     throw error;
   }
 };
+
+export const marcarCompletado = async (
+  id: string,
+  date: string
+): Promise<void> => {
+  try {
+    const docRef = doc(habitosRef, id);
+    const habito = (await getDoc(docRef)).data() as Habito;
+
+    const isCompleted = habito.completed?.[date];
+    if (isCompleted) {
+      const { [date]: _, ...resto } = habito.completed || {};
+      await updateDoc(docRef, {
+        completed: resto,
+      });
+    } else {
+      await updateDoc(docRef, {
+        completed: {
+          ...habito.completed,
+          [date]: true,
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error al alternar el estado del hábito:", error);
+    throw error;
+  }
+};
+
+export const getHabitosCompletados = async (
+  userId: string,
+  date: string
+): Promise<Habito[]> => {
+  try {
+    const querySnapshot = await getDocs(
+      query(habitosRef, where("user_id", "==", userId))
+    );
+
+    const habitos = querySnapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() } as Habito))
+      .filter((habito) => habito.completed?.[date] === false);
+
+    return habitos;
+  } catch (error) {
+    console.error("Error al obtener hábitos completados:", error);
+    throw error;
+  }
+};
